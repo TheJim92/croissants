@@ -52,6 +52,9 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
+  //Offset? _tapPosition;
+  List<Widget> croissantList = [];
+
   void _incrementCounter() {
     setState(() {
       // This call to setState tells the Flutter framework that something has
@@ -63,12 +66,16 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  List<Widget> _croissantList() {
-    List<Widget> croissantList = [];
-    for (int i = 0; i < _counter; i++) {
-      croissantList.add(const Croissant());
-    }
+/*  List<Widget> _addCroissant() {
+      croissantList.add(Croissant());
     return croissantList;
+  }*/
+
+  void _getTapPosition(TapDownDetails details) async {
+    final tapPosition = details.globalPosition;
+    setState(() {
+      croissantList.add(Croissant(tapPosition));
+    });
   }
 
   @override
@@ -79,29 +86,44 @@ class _MyHomePageState extends State<MyHomePage> {
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
-    return Material(
-        child: InkWell(
-            onTap: _incrementCounter,
-            child: Stack(children: _counter <= 0 ? [Center(child: Text("Tap to croissant.", textScaleFactor: 2))] : _croissantList())));
+    return GestureDetector(
+        onTapDown: (details) {
+          _getTapPosition(details);
+          print("X: " +
+              details.globalPosition.dx.toString() +
+              "\nY: " +
+              details.globalPosition.dy.toString());
+          _incrementCounter();
+        },
+        onTapUp: (details) => setState(() {}),
+        child: Scaffold(
+          body: Stack(
+              children: _counter <= 0
+                  ? [
+                      Center(
+                          child: Text("Tap to croissant.", textScaleFactor: 2))
+                    ]
+                  : croissantList),
+        ));
   }
 }
 
 class Croissant extends StatelessWidget {
-  const Croissant({Key? key}) : super(key: key);
+  Offset? tapPosition;
+
+  Croissant(this.tapPosition, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(right:Random().nextInt(200).toDouble(),
-          top: Random().nextInt(400).toDouble(),
-          bottom: Random().nextInt(400).toDouble(),
-          left: Random().nextInt(200).toDouble()
-      ),
-      child: Center(
-        child: Transform.rotate(
-            angle: Random().nextInt(100).toDouble(),
-            child: Image.asset("assets/croissant.png")),
-      ),
+    return Positioned(
+      left: tapPosition!.dx - 100,
+      top: tapPosition!.dy - 60,
+      child: Transform.rotate(
+          angle: Random().nextInt(100).toDouble(),
+          child: SizedBox(
+              height: 120 + Random().nextInt(100).toDouble(),
+              width: 160 + Random().nextInt(60).toDouble(),
+              child: Image.asset("assets/croissant.png"))),
     );
   }
 }
