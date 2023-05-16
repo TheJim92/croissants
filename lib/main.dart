@@ -118,18 +118,25 @@ class Croissant extends StatelessWidget {
     return Positioned(
       left: tapPosition!.dx - 100,
       top: tapPosition!.dy - 60,
-      child: PlayAnimationBuilder<double>(
-        curve: Curves.decelerate,
-        tween: Tween(begin: 1.5 * pi, end: 2 * pi), // 0° to 360° (2π)
-        duration: const Duration(milliseconds: 500),
-        builder: (context, value, _) {
-          return Transform.rotate(
-              angle: startRotation + value,
-              child: SizedBox(
-                  height: startHeight + 120,
-                  width: startWidth + 160,
-                  child: Image.asset("assets/croissant.png")));
-        },
+      child: PlayAnimationBuilder(
+          curve: Curves.decelerate,
+          tween: Tween(begin: 100 * pi, end: 1* pi),
+          duration: const Duration(milliseconds: 500), // 0° to 360° (2π)
+          builder: (context, zoom, _) {
+          return PlayAnimationBuilder<double>(
+            curve: Curves.decelerate,
+            tween: Tween(begin: 1.5 * pi, end: 2 * pi), // 0° to 360° (2π)
+            duration: const Duration(milliseconds: 500),
+            builder: (context, spin, _) {
+              return Transform.rotate(
+                  angle: startRotation + spin,
+                  child: SizedBox(
+                      height: startHeight + 120 + zoom,
+                      width: startWidth + 160 + zoom,
+                      child: Image.asset("assets/croissant.png")));
+            },
+          );
+        }
       ),
     );
   }
