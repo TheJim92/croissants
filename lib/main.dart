@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:simple_animations/animation_builder/play_animation_builder.dart';
 
 void main() {
   runApp(const MyApp());
@@ -51,8 +52,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+  double turns = 0.0;
 
-  //Offset? _tapPosition;
   List<Widget> croissantList = [];
 
   void _incrementCounter() {
@@ -65,11 +66,6 @@ class _MyHomePageState extends State<MyHomePage> {
       _counter++;
     });
   }
-
-/*  List<Widget> _addCroissant() {
-      croissantList.add(Croissant());
-    return croissantList;
-  }*/
 
   void _getTapPosition(TapDownDetails details) async {
     final tapPosition = details.globalPosition;
@@ -115,15 +111,26 @@ class Croissant extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double startRotation = Random().nextInt(100).toDouble();
+    double startHeight = Random().nextInt(100).toDouble();
+    double startWidth = Random().nextInt(60).toDouble();
+
     return Positioned(
       left: tapPosition!.dx - 100,
       top: tapPosition!.dy - 60,
-      child: Transform.rotate(
-          angle: Random().nextInt(100).toDouble(),
-          child: SizedBox(
-              height: 120 + Random().nextInt(100).toDouble(),
-              width: 160 + Random().nextInt(60).toDouble(),
-              child: Image.asset("assets/croissant.png"))),
+      child: PlayAnimationBuilder<double>(
+        curve: Curves.decelerate,
+        tween: Tween(begin: 1.5 * pi, end: 2 * pi), // 0° to 360° (2π)
+        duration: const Duration(milliseconds: 500),
+        builder: (context, value, _) {
+          return Transform.rotate(
+              angle: startRotation + value,
+              child: SizedBox(
+                  height: startHeight + 120,
+                  width: startWidth + 160,
+                  child: Image.asset("assets/croissant.png")));
+        },
+      ),
     );
   }
 }
